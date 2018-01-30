@@ -77,27 +77,19 @@ void loop()
 //Potentiometer
 
   Pulsdauer = analogRead(InputPotiA);
-  Pulsdauer = map(Pulsdauer, 0, 1014, 20, 100); // Intervall der Pulsdauer: 20ms - 100ms
   //Serial.println(Pulsdauer);
+  Pulsdauer = map(Pulsdauer, 0, 1010, 20, 100); // Intervall der Pulsdauer: 20ms - 100ms
   //delay(20);
 
   Wiederholfrequenz = analogRead(InputPotiB);
-  Wiederholfrequenz = map(Wiederholfrequenz, 0, 1014, 2000, 200); // Intervall der Wiederholfrequenz: 20ms - 2000ms
-  //Serial.println(Leistung);
+  //Serial.println(Wiederholfrequenz);
+  Wiederholfrequenz = map(Wiederholfrequenz, 0, 1010, 2000, 200); // Intervall der Wiederholfrequenz: 20ms - 2000ms
   //delay(20);
 
   Leistung = analogRead(InputPotiC);
-  Serial.println(Leistung);
+  //Serial.println(Leistung);
   Leistung = map(Leistung, 0, 1010, 150, 255); // Intervall der PWM: 150 - 255
-  
   //delay(20);
-
-
-/*
-  analogWrite(Hubmagnet, Leistung);
-  delay(Pulsdauer);
-  analogWrite(Hubmagnet, Leistung);
-  delay(Wiederholfrequenz);*/
 
 }
 
