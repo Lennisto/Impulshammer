@@ -82,7 +82,7 @@ void loop()
   //delay(20);
 
   Wiederholfrequenz = analogRead(InputPotiB);
-  Wiederholfrequenz = map(Wiederholfrequenz, 0, 1023, 200, 2000); // Intervall der Wiederholfrequenz: 20ms - 2000ms
+  Wiederholfrequenz = map(Wiederholfrequenz, 0, 1014, 2000, 200); // Intervall der Wiederholfrequenz: 20ms - 2000ms
   //Serial.println(Leistung);
   //delay(20);
 
@@ -116,7 +116,7 @@ void lcd_print_static()
   lcd.setCursor(14,0);
   lcd.print("ms");
   lcd.setCursor(0,1);
-  lcd.print("Leistung=");
+  lcd.print("Leistung =");
   lcd.setCursor(14,1);
   lcd.print("%");
 }
