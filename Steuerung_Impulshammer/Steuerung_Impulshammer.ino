@@ -29,7 +29,9 @@ int InputPotiC = 3; // PotiC --> Leistung
 int Hubmagnet = 3; // Gate des Mosfets an Pin 3 (PWM)
 
 int tic;
-
+bool pressed=false;
+bool pressed_dauer=false;
+bool dauerbetrieb=false;
 
 void setup() {
   //Setup KraM
@@ -53,9 +55,43 @@ void loop()
 //Taster
   
   ZustandTasterA = digitalRead(InputTasterA);
+  ZustandTasterB = digitalRead(InputTasterB);
+
+  if((ZustandTasterA==true)&&(dauerbetrieb==false))
+  {
+    einzel_betrieb();
+  }
+  if((ZustandTasterA==false)&&(dauerbetrieb==false))
+  {
+    pressed=false;
+  }
+
+  
+  if((ZustandTasterB==true))
+  {
+    dauerbetrieb=true;
+    pressed_dauer=true;
+    delay(20);
+  }
+  if(dauerbetrieb==true)
+  {
+    fire(Leistung,Wiederholfrequenz,Pulsdauer);
+  }
+
+  if((ZustandTasterB==true)&&(pressed_dauer==false))
+  {
+    dauerbetrieb=false;
+  }
+   if((ZustandTasterB==false))
+  {
+    pressed_dauer=false;
+  }
+  
+
+  
   //Serial.println(ZustandTasterA,DEC);
    
-  ZustandTasterB = digitalRead(InputTasterB);
+  
   //Serial.println(ZustandTasterB,DEC);
 
 
@@ -105,26 +141,36 @@ void lcd_print_dynamic()
   {
     lcd.setCursor(10,0);
     lcd.print("    ");
-
     lcd.setCursor(10,1);
     lcd.print("    ");
     tic=millis();
   }
- 
-  
   lcd.setCursor(10,0);
   lcd.print(Pulsdauer);
-  
-  double leistung=0.393*Leistung;
-  
-  //int leistung = Leistung;
-  
+  double leistung=0.393*Leistung; 
   lcd.setCursor(10,1);
   lcd.print((int)leistung);
-  
-  
 }
 
 
 
+void einzel_betrieb()
+{
+  if(pressed==false)
+  {
+    fire(Leistung,Pulsdauer,Pulsdauer);
+    pressed=true;
+  }
+  
+}
+
+
+void fire(int leistung,int frequenz,int pulsdauer)
+{
+   int wait=frequenz-pulsdauer;
+   analogWrite(Hubmagnet, leistung);
+   delay(pulsdauer);
+   analogWrite(Hubmagnet, 0);
+   delay(wait);
+}
 
