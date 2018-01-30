@@ -20,18 +20,20 @@ int ZustandTasterB;
 
 //Pin Belegungen der Inputs
 int InputTasterA = 2; // TasterA --> Einzelbetrieb 
-int InputTasterB = 7; // TasterB --> Dauerbetrieb
+int InputTasterB = 3; // TasterB --> Dauerbetrieb
 int InputPotiA = 1; // PotiA --> Pulsdauer
 int InputPotiB = 2; // PotiB --> Wiederholfrequenz
 int InputPotiC = 3; // PotiC --> Leistung
 
 //Pin Belegungen der Outputs
-int Hubmagnet = 3; // Gate des Mosfets an Pin 3 (PWM)
+int Hubmagnet = 9; // Gate des Mosfets an Pin 3 (PWM)
 
 int tic;
 bool pressed=false;
 bool pressed_dauer=false;
 bool dauerbetrieb=false;
+
+volatile byte state=LOW;
 
 void setup() {
   //Setup KraM
@@ -40,6 +42,7 @@ void setup() {
   pinMode(InputTasterA,INPUT);
   pinMode(InputTasterB,INPUT);
   pinMode(Hubmagnet, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(InputTasterB), toggle, RISING);
 
   tic=millis();
   lcd_print_static();
@@ -49,8 +52,6 @@ void setup() {
 
 void loop() 
 {
-
-
   lcd_print_dynamic();
 //Taster
   
@@ -67,25 +68,13 @@ void loop()
   }
 
   
-  if((ZustandTasterB==true))
-  {
-    dauerbetrieb=true;
-    pressed_dauer=true;
-    delay(20);
-  }
-  if(dauerbetrieb==true)
+  
+  if(state==true)
   {
     fire(Leistung,Wiederholfrequenz,Pulsdauer);
   }
 
-  if((ZustandTasterB==true)&&(pressed_dauer==false))
-  {
-    dauerbetrieb=false;
-  }
-   if((ZustandTasterB==false))
-  {
-    pressed_dauer=false;
-  }
+ 
   
 
   
@@ -120,6 +109,13 @@ void loop()
   analogWrite(Hubmagnet, Leistung);
   delay(Wiederholfrequenz);*/
 
+}
+
+
+void toggle()
+{
+  state=!state;
+  delay(20);
 }
 
 
