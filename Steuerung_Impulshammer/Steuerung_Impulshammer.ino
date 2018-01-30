@@ -30,10 +30,8 @@ int Hubmagnet = 9; // Gate des Mosfets an Pin 3 (PWM)
 
 int tic;
 bool pressed=false;
-bool pressed_dauer=false;
-bool dauerbetrieb=false;
 
-volatile byte state=LOW;
+volatile byte dauerbetrieb=LOW;
 
 void setup() {
   //Setup KraM
@@ -48,15 +46,12 @@ void setup() {
   lcd_print_static();
 }
 
-
-
 void loop() 
 {
   lcd_print_dynamic();
 //Taster
   
   ZustandTasterA = digitalRead(InputTasterA);
-  ZustandTasterB = digitalRead(InputTasterB);
 
   if((ZustandTasterA==true)&&(dauerbetrieb==false))
   {
@@ -67,15 +62,10 @@ void loop()
     pressed=false;
   }
 
-  
-  
-  if(state==true)
+  if(dauerbetrieb==true)
   {
     fire(Leistung,Wiederholfrequenz,Pulsdauer);
   }
-
- 
-  
 
   
   //Serial.println(ZustandTasterA,DEC);
@@ -114,8 +104,8 @@ void loop()
 
 void toggle()
 {
-  state=!state;
-  delay(20);
+  dauerbetrieb=!dauerbetrieb;
+  delayMicroseconds(20);
 }
 
 
