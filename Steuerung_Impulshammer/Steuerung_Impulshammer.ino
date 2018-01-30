@@ -20,16 +20,18 @@ int ZustandTasterB;
 
 //Pin Belegungen der Inputs
 int InputTasterA = 2; // TasterA --> Einzelbetrieb 
-int InputTasterB = 7; // TasterB --> Dauerbetrieb
+int InputTasterB = 3; // TasterB --> Dauerbetrieb
 int InputPotiA = 1; // PotiA --> Pulsdauer
 int InputPotiB = 2; // PotiB --> Wiederholfrequenz
 int InputPotiC = 3; // PotiC --> Leistung
 
 //Pin Belegungen der Outputs
-int Hubmagnet = 3; // Gate des Mosfets an Pin 3 (PWM)
+int Hubmagnet = 9; // Gate des Mosfets an Pin 3 (PWM)
 
 int tic;
+bool pressed=false;
 
+volatile byte dauerbetrieb=LOW;
 
 void setup() {
   //Setup KraM
@@ -38,24 +40,37 @@ void setup() {
   pinMode(InputTasterA,INPUT);
   pinMode(InputTasterB,INPUT);
   pinMode(Hubmagnet, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(InputTasterB), toggle, RISING);
 
   tic=millis();
   lcd_print_static();
 }
 
-
-
 void loop() 
 {
-
-
   lcd_print_dynamic();
 //Taster
   
   ZustandTasterA = digitalRead(InputTasterA);
+
+  if((ZustandTasterA==true)&&(dauerbetrieb==false))
+  {
+    einzel_betrieb();
+  }
+  if((ZustandTasterA==false)&&(dauerbetrieb==false))
+  {
+    pressed=false;
+  }
+
+  if(dauerbetrieb==true)
+  {
+    fire(Leistung,Wiederholfrequenz,Pulsdauer);
+  }
+
+  
   //Serial.println(ZustandTasterA,DEC);
    
-  ZustandTasterB = digitalRead(InputTasterB);
+  
   //Serial.println(ZustandTasterB,DEC);
 
 
@@ -87,6 +102,13 @@ void loop()
 }
 
 
+void toggle()
+{
+  dauerbetrieb=!dauerbetrieb;
+  delayMicroseconds(20);
+}
+
+
 void lcd_print_static()
 {
   lcd.setCursor(0,0);
@@ -105,26 +127,36 @@ void lcd_print_dynamic()
   {
     lcd.setCursor(10,0);
     lcd.print("    ");
-
     lcd.setCursor(10,1);
     lcd.print("    ");
     tic=millis();
   }
- 
-  
   lcd.setCursor(10,0);
   lcd.print(Pulsdauer);
-  
-  double leistung=0.393*Leistung;
-  
-  //int leistung = Leistung;
-  
+  double leistung=0.393*Leistung; 
   lcd.setCursor(10,1);
   lcd.print((int)leistung);
-  
-  
 }
 
 
 
+void einzel_betrieb()
+{
+  if(pressed==false)
+  {
+    fire(Leistung,Pulsdauer,Pulsdauer);
+    pressed=true;
+  }
+  
+}
+
+
+void fire(int leistung,int frequenz,int pulsdauer)
+{
+   int wait=frequenz-pulsdauer;
+   analogWrite(Hubmagnet, leistung);
+   delay(pulsdauer);
+   analogWrite(Hubmagnet, 0);
+   delay(wait);
+}
 
